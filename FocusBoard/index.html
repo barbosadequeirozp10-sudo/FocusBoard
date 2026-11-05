@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="description" content="FocusBoard: quadro Kanban, lista e indicadores para organizar suas tarefas." />
+  <title>FocusBoard 2.0 — Sua rotina, sob controle</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <a class="brand" href="#board" aria-label="FocusBoard — início"><span class="brand-mark">✦</span><span>focus<span class="brand-light">board</span><small>WORKSPACE PESSOAL</small></span></a>
+      <p class="sidebar-label">VISUALIZAÇÕES</p>
+      <nav class="nav" aria-label="Visualizações">
+        <button type="button" class="nav-item active" data-view="board"><span class="nav-icon">▦</span> Quadro Kanban</button>
+        <button type="button" class="nav-item" data-view="list"><span class="nav-icon">☰</span> Todas as tarefas</button>
+        <button type="button" class="nav-item" data-view="dashboard"><span class="nav-icon">◫</span> Dashboard</button>
+      </nav>
+      <div class="side-panel"><span class="tiny-dot"></span><strong>Espaço local</strong><p>Suas tarefas ficam salvas neste navegador. Faça backups quando precisar.</p></div>
+      <p class="sidebar-footer">FOCUSBOARD 2.0 <span>•</span> FEITO PARA APRENDER</p>
+    </aside>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div class="header-copy"><p class="eyebrow">PRODUTIVIDADE / VISÃO GERAL</p><h1 id="pageTitle">Quadro Kanban</h1><p id="pageSubtitle" class="subtitle">Mais clareza para suas tarefas, um passo por vez.</p></div>
+        <div class="header-buttons"><button id="themeBtn" class="btn btn-icon" type="button" aria-label="Alternar tema" title="Alternar tema">☀</button><button id="exportBtn" class="btn btn-secondary" type="button">↧ <span>Exportar</span></button><button id="addBtn" class="btn btn-primary" type="button">＋ Nova tarefa</button></div>
+      </header>
+
+      <div id="storageWarning" class="notice hidden" role="alert">⚠ Não foi possível acessar o armazenamento do navegador. Alterações podem não permanecer depois que a página for fechada.</div>
+
+      <section class="welcome-banner" aria-label="Apresentação"><div><span class="mini-label">SEU DIA COMEÇA AQUI</span><h2>Organize o que importa.<br /><em>Conclua com tranquilidade.</em></h2><p>Transforme ideias em tarefas, acompanhe seu progresso e mantenha o foco.</p></div><div class="banner-graphic" aria-hidden="true"><span class="bg-orbit orbit-a"></span><span class="bg-orbit orbit-b"></span><div class="float-check">✓</div><div class="float-card"><span class="short-line"></span><span class="long-line"></span><span class="short-line muted-line"></span></div></div></section>
+
+      <section class="metrics" id="metrics" aria-label="Resumo geral"></section>
+
+      <section class="workspace-head"><div><h2 id="sectionTitle">Meu quadro</h2><p id="sectionSubtitle">Arraste os cartões ou altere o status para organizar.</p></div><div class="data-actions"><button id="demoBtn" type="button" class="link-action">✧ Carregar exemplo</button><button id="importBtn" type="button" class="link-action">↥ Importar backup</button><input id="importFile" type="file" accept=".json,application/json" hidden aria-label="Selecionar backup JSON"></div></section>
+
+      <section class="toolbar" aria-label="Pesquisar e filtrar tarefas"><label class="search-box"><span class="search-icon">⌕</span><span class="sr-only">Pesquisar tarefas</span><input type="search" id="searchInput" placeholder="Pesquisar tarefas ou descrição..." autocomplete="off"></label><select id="priorityFilter" aria-label="Filtrar prioridade"><option value="">Todas as prioridades</option><option value="alta">Alta prioridade</option><option value="media">Média prioridade</option><option value="baixa">Baixa prioridade</option></select><select id="dueFilter" aria-label="Filtrar prazo"><option value="">Todos os prazos</option><option value="overdue">Atrasadas</option><option value="today">Para hoje</option><option value="upcoming">Próximas</option><option value="nodate">Sem prazo</option></select><button type="button" id="clearFilters" class="btn btn-ghost">Limpar</button></section>
+
+      <section id="content" aria-live="polite" aria-label="Tarefas"></section>
+      <footer>FocusBoard 2.0 · HTML, CSS e JavaScript · Sem servidor · <span id="footerCount">0 tarefas</span></footer>
+    </main>
+  </div>
+
+  <dialog id="taskDialog" aria-labelledby="formHeading"><form id="taskForm" novalidate><div class="dialog-top"><div><span class="eyebrow">GERENCIAMENTO</span><h2 id="formHeading">Nova tarefa</h2></div><button id="closeForm" class="close-button" type="button" aria-label="Fechar formulário">✕</button></div><input id="taskId" type="hidden"><label for="taskTitle">Título <span class="required">*</span></label><input id="taskTitle" type="text" maxlength="120" required placeholder="Ex.: Revisar JavaScript" /><label for="taskDescription">Descrição <span class="optional">(opcional)</span></label><textarea id="taskDescription" maxlength="700" rows="3" placeholder="Detalhes que ajudam você a concluir a tarefa..."></textarea><div class="form-row"><div><label for="taskStatus">Etapa</label><select id="taskStatus"><option value="todo">A fazer</option><option value="doing">Em andamento</option><option value="done">Concluído</option></select></div><div><label for="taskPriority">Prioridade</label><select id="taskPriority"><option value="baixa">Baixa</option><option value="media" selected>Média</option><option value="alta">Alta</option></select></div></div><div class="form-row"><div><label for="taskDue">Prazo <span class="optional">(opcional)</span></label><input id="taskDue" type="date" /></div><div><label for="taskCategory">Categoria <span class="optional">(opcional)</span></label><input id="taskCategory" type="text" maxlength="32" placeholder="Estudos, Trabalho..." /></div></div><p id="formError" class="form-error" role="alert" hidden></p><div class="form-actions"><button id="cancelForm" class="btn btn-secondary" type="button">Cancelar</button><button class="btn btn-primary" type="submit">Salvar tarefa</button></div></form></dialog>
+  <dialog id="deleteDialog" aria-labelledby="deleteHeading"><div class="confirm-modal"><div class="danger-icon">!</div><h2 id="deleteHeading">Excluir esta tarefa?</h2><p>Essa ação remove a tarefa do seu quadro e não pode ser desfeita.</p><div class="form-actions"><button id="cancelDelete" type="button" class="btn btn-secondary">Cancelar</button><button id="confirmDelete" type="button" class="btn btn-danger">Sim, excluir</button></div></div></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
